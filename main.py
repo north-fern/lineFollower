@@ -21,35 +21,38 @@ class mySensor(Ev3devSensor):
         self._mode('ANALOG')
         return self._value(0)
 
-#left = Motor(Port.A)
-#right = Motor(Port.B)
-#wheelDiam =  56
-#wheelSpace = 180
+left = Motor(Port.A)
+right = Motor(Port.D)
+wheelDiam =  56
+wheelSpace = 180
 
-#robot = DriveBase(left, right, wheelDiam, wheelSpace)
-kd = .9
+robot = DriveBase(left, right, wheelDiam, wheelSpace)
+kd = .02
 # Write your program here
 
 def adjustMovement(sensval1 ,sensval2):
-    differ = sensval1 - sensval2
-    #robot.drive(40, kd*differ)
+    differ = sensval1 - sensval2 + 1
+    speedadjust = abs(kd*differ/10)
+    print(differ, ",", kd*differ, ",", speedadjust)
+    robot.drive(-10/speedadjust, kd*differ)
 
 
 def main():
-    sens1 = LegoPort(address = 'ev3-ports:in2')
-    sens2 = LegoPort(address = 'ev3-ports:in3')
+    sens1 = LegoPort(address = 'ev3-ports:in3')
     sens1.mode = 'ev3-analog'
-    sens2.mode = 'ev3-analog'
     utime.sleep(0.5)
     sensor_left = mySensor(Port.S2)
-    sensor_right = mySensor(Port.S3)
+    sensor_right = mySensor(Port.S4)
     val1 = sensor_left.readvalue()
     val2 = sensor_right.readvalue()
     print(val1 , ',', val2)
-    #adjustMovement(val1,val2)
+    
     while True:
-        print(sensor_left.readvalue())
-        wait(200)
+        val1 = sensor_left.readvalue()
+        val2 = sensor_right.readvalue()
+        #print(val1 , ',', val2)
+        adjustMovement(val1,val2)
+        
     
 
 main()
