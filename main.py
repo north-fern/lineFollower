@@ -33,12 +33,22 @@ kd = .04
 # Write your program here
 
 def adjustMovement(sensval1 ,sensval2):
-    differ = sensval1 - sensval2 + 1
-    speedadjust = abs(differ/36)
+    differ = sensval1 - sensval2 + 1.01
+    if (sensval1 >3300 and sensval2 > 3300):
+        robot.drive(0, 20)
+        wait(50)
+        sensor_left = mySensor(Port.S2)
+        sensor_right = mySensor(Port.S4)
+        sensval1 = sensor_left.readvalue()
+        sensval2 = sensor_right.readvalue()
+    if (sensval1 >3300 and sensval2 > 3300):
+        robot.drive(0, -20)
+        wait(100)
+    speedadjust = abs(differ/28)
     #print(differ, ", TURNING: ", differ*kd/(1+differ), ", SPEED: ", -40/speedadjust)
     #robot.drive(-40/speedadjust, differ*kd/(1+differ))
-    print(differ, ", TURNING: ", differ*kd, ", SPEED: ", -40/speedadjust)
-    robot.drive(-40/speedadjust, differ*kd)
+    print(differ, ", TURNING: ", differ*kd, ", SPEED: ", -35/speedadjust)
+    robot.drive(-35/speedadjust, differ*kd)
 
 """ def adjustMovement(sensval1 ,sensval2, differ):
     differNew = (differ + (sensval1 - sensval2)*kd)
@@ -49,7 +59,7 @@ def adjustMovement(sensval1 ,sensval2):
 
 
 def main():
-    sens1 = LegoPort(address = 'ev3-ports:in3')
+    sens1 = LegoPort(address = 'ev3-ports:in4')
     sens1.mode = 'ev3-analog'
     utime.sleep(0.5)
     sensor_left = mySensor(Port.S2)
@@ -63,15 +73,15 @@ def main():
         avg = summer/2
         tot = avg + tot
         i = i + 1
-    errleft = sensor_left.readvalue() - tot/2
-    errright = sensor_right.readvalue() - tot/2
+    errleft = sensor_left.readvalue() - tot/i
+    errright = sensor_right.readvalue() - tot/i
     tail.dc(60)
     # differ = 1
     # differ1 =adjustMovement(val1,val2, differ)
     while True:
         val1 = sensor_left.readvalue()
         val2 = sensor_right.readvalue()
-        #print(val1 , ',', val2)
+        print(val1 , ',', val2)
         adjustMovement(val1 - errleft,val2 - errright)
         
 
