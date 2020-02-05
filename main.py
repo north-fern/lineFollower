@@ -22,19 +22,30 @@ class mySensor(Ev3devSensor):
         return self._value(0)
 
 left = Motor(Port.A)
-right = Motor(Port.D)
+right = Motor(Port.C)
 wheelDiam =  56
 wheelSpace = 180
+tail = Motor(Port.B)
 
 robot = DriveBase(left, right, wheelDiam, wheelSpace)
-kd = .02
+#kd = .9
+kd = .04
 # Write your program here
 
 def adjustMovement(sensval1 ,sensval2):
     differ = sensval1 - sensval2 + 1
-    speedadjust = abs(kd*differ/10)
-    print(differ, ",", kd*differ, ",", speedadjust)
-    robot.drive(-10/speedadjust, kd*differ)
+    speedadjust = abs(differ/36)
+    #print(differ, ", TURNING: ", differ*kd/(1+differ), ", SPEED: ", -40/speedadjust)
+    #robot.drive(-40/speedadjust, differ*kd/(1+differ))
+    print(differ, ", TURNING: ", differ*kd, ", SPEED: ", -40/speedadjust)
+    robot.drive(-40/speedadjust, differ*kd)
+
+""" def adjustMovement(sensval1 ,sensval2, differ):
+    differNew = (differ + (sensval1 - sensval2)*kd)
+    speedadjust = (sensval1 - sensval2)*kd
+    print(differ, ", TURNING: ", kd*differNew, ", SPEED: ", -40/(abs(speedadjust)))
+    robot.drive(-40/(abs(speedadjust)), kd*differNew)
+    return differNew """
 
 
 def main():
@@ -43,16 +54,25 @@ def main():
     utime.sleep(0.5)
     sensor_left = mySensor(Port.S2)
     sensor_right = mySensor(Port.S4)
-    val1 = sensor_left.readvalue()
-    val2 = sensor_right.readvalue()
-    print(val1 , ',', val2)
-    
+    i = 1
+    tot = 0
+    while i < 5:
+        val1 = sensor_left.readvalue()
+        val2 = sensor_right.readvalue()
+        summer = val1 + val2
+        avg = summer/2
+        tot = avg + tot
+        i = i + 1
+    errleft = sensor_left.readvalue() - tot/2
+    errright = sensor_right.readvalue() - tot/2
+    tail.dc(60)
+    # differ = 1
+    # differ1 =adjustMovement(val1,val2, differ)
     while True:
         val1 = sensor_left.readvalue()
         val2 = sensor_right.readvalue()
         #print(val1 , ',', val2)
-        adjustMovement(val1,val2)
+        adjustMovement(val1 - errleft,val2 - errright)
         
-    
 
 main()
