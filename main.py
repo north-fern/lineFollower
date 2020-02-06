@@ -24,31 +24,22 @@ class mySensor(Ev3devSensor):
 left = Motor(Port.A)
 right = Motor(Port.C)
 wheelDiam =  56
-wheelSpace = 180
+wheelSpace = 100
 tail = Motor(Port.B)
 
 robot = DriveBase(left, right, wheelDiam, wheelSpace)
 #kd = .9
-kd = .04
+kp = .8
 # Write your program here
 
 def adjustMovement(sensval1 ,sensval2):
     differ = sensval1 - sensval2 + 1.01
-    if (sensval1 >3300 and sensval2 > 3300):
-        robot.drive(0, 20)
-        wait(50)
-        sensor_left = mySensor(Port.S2)
-        sensor_right = mySensor(Port.S4)
-        sensval1 = sensor_left.readvalue()
-        sensval2 = sensor_right.readvalue()
-    if (sensval1 >3300 and sensval2 > 3300):
-        robot.drive(0, -20)
-        wait(100)
-    speedadjust = abs(differ/28)
+
+    #speedadjust = abs(differ/28)-35/speedadjust
     #print(differ, ", TURNING: ", differ*kd/(1+differ), ", SPEED: ", -40/speedadjust)
     #robot.drive(-40/speedadjust, differ*kd/(1+differ))
-    print(differ, ", TURNING: ", differ*kd, ", SPEED: ", -35/speedadjust)
-    robot.drive(-35/speedadjust, differ*kd)
+    #print(differ, ", TURNING: ", differ*kd, ", SPEED: ", -35/speedadjust)
+    robot.drive(-30, differ*kp)
 
 """ def adjustMovement(sensval1 ,sensval2, differ):
     differNew = (differ + (sensval1 - sensval2)*kd)
@@ -81,7 +72,7 @@ def main():
     while True:
         val1 = sensor_left.readvalue()
         val2 = sensor_right.readvalue()
-        print(val1 , ',', val2)
+        #print(val1 , ',', val2)
         adjustMovement(val1 - errleft,val2 - errright)
         
 
